@@ -10,6 +10,9 @@ function Home() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (language === "" || !language) {
+      return toast.error("Select a language");
+    }
     try {
       const res = await axios.post(`http://localhost:8000/save-data`, {
         username,
@@ -60,6 +63,10 @@ function Home() {
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             onChange={(e) => setLanguage(e.target.value)}
           >
+            <option value="" disabled selected>
+              Select a language
+            </option>
+
             <option value="C++">C++</option>
             <option value="Java">Java</option>
             <option value="JavaScript">JavaScript</option>

@@ -3,6 +3,7 @@ const mysql = require("mysql");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const redis = require("redis");
+const axios = require("axios");
 
 const app = express();
 require("dotenv").config();
@@ -55,15 +56,67 @@ const cacheMiddleware = async (req, res, next) => {
   }
 };
 
-app.post("/save-data", (req, res) => {
+app.post("/save-data", async (req, res) => {
   try {
     const { username, language, stdin, code } = req.body;
-    if (!username || !language || !stdin || !code) {
+
+    if (!username || !language || !code) {
       return res.status(400).send({
         message: "Missing fields!",
         success: false,
       });
     }
+
+    // let lang_id = undefined;
+
+    // if (language == "C++") {
+    //   lang_id = 52;
+    // } else if (language == "Java") {
+    //   lang_id = 62;
+    // } else if (language == "JavaScript") {
+    //   lang_id = 63;
+    // } else if (language == "Python") {
+    //   lang_id = 71;
+    // }
+
+    // const options1 = {
+    //   method: "POST",
+    //   url: "https://judge0-ce.p.rapidapi.com/submissions",
+    //   params: {
+    //     base64_encoded: "true",
+    //     fields: "*",
+    //   },
+    //   headers: {
+    //     "content-type": "application/json",
+    //     "X-RapidAPI-Key": "9f887d63demshe7c5f8112f5852fp155e0cjsn9b35e345fa4a",
+    //     "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
+    //   },
+    //   data: {
+    //     language_id: 52,
+    //     source_code: JSON.stringify(code),
+    //     stdin: JSON.stringify(stdin),
+    //   },
+    // };
+    // const response1 = await axios.request(options1);
+    // console.log(response1.data.token);
+    // const token = response1.data.token;
+
+    // const options2 = {
+    //   method: "GET",
+    //   url: `https://judge0-ce.p.rapidapi.com/submissions/${token}`,
+    //   params: {
+    //     base64_encoded: "true",
+    //     fields: "*",
+    //   },
+    //   headers: {
+    //     "X-RapidAPI-Key": "9f887d63demshe7c5f8112f5852fp155e0cjsn9b35e345fa4a",
+    //     "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
+    //   },
+    // };
+
+    // const response2 = await axios.request(options2);
+    // console.log(response2.data);
+
     const sql =
       "INSERT INTO User (username, language, stdin, code) VALUES (?, ?, ?, ?)";
     const values = [username, language, stdin, code];
