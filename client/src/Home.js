@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
   const [username, setUsername] = useState();
   const [language, setLanguage] = useState();
   const [stdin, setStdin] = useState();
   const [code, setCode] = useState();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,6 +24,7 @@ function Home() {
       });
       if (res?.data.success) {
         toast.success("Data saved");
+        navigate("/dashboard");
       }
     } catch (error) {
       console.log(error);
