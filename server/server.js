@@ -26,7 +26,14 @@ db.connect((err) => {
   console.log("Connected to MySQL database");
 });
 
-const client = redis.createClient();
+const client = redis.createClient({
+  password: "k7dKK7J3p4Ku2HMJBWfEoAAhkj23K7Dk",
+  socket: {
+    host: "redis-14554.c264.ap-south-1-1.ec2.cloud.redislabs.com",
+    port: 14554,
+  },
+});
+
 (async () => {
   await client.connect();
 })();
