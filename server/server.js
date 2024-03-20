@@ -27,7 +27,7 @@ db.connect((err) => {
 });
 
 const client = redis.createClient({
-  password: "k7dKK7J3p4Ku2HMJBWfEoAAhkj23K7Dk",
+  password: process.env.REDIS_PASSWORD,
   socket: {
     host: "redis-14554.c264.ap-south-1-1.ec2.cloud.redislabs.com",
     port: 14554,
