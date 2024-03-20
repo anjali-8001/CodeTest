@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 
@@ -25,6 +25,9 @@ function Home() {
       toast.error("Something went wrong");
     }
   };
+  useEffect(() => {
+    console.log(language);
+  }, [language]);
 
   return (
     <div className="text-white bg-black min-h-[100vh] min-w-[100vw]">

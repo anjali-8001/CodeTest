@@ -2,7 +2,7 @@ const express = require("express");
 const mysql = require("mysql");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-// const redis = require("redis");
+const redis = require("redis");
 
 const app = express();
 require("dotenv").config();
@@ -25,11 +25,41 @@ db.connect((err) => {
   console.log("Connected to MySQL database");
 });
 
+const client = redis.createClient();
+(async () => {
+  await client.connect();
+})();
+client.on("error", (error) => {
+  console.log(error);
+});
+client.on("connect", (error) => {
+  console.log("Connection established");
+});
+
+const cacheMiddleware = async (req, res, next) => {
+  // Check if data exists in Redis cache
+  try {
+    const cachevalue = await client.get("result");
+    const result = JSON.parse(cachevalue);
+    if (cachevalue) {
+      return res.status(200).send({
+        message: "data from redis",
+        success: true,
+        result,
+      });
+    } else {
+      next();
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 app.post("/save-data", (req, res) => {
   try {
     const { username, language, stdin, code } = req.body;
     if (!username || !language || !stdin || !code) {
-      res.status(400).send({
+      return res.status(400).send({
         message: "Missing fields!",
         success: false,
       });
@@ -39,6 +69,7 @@ app.post("/save-data", (req, res) => {
     const values = [username, language, stdin, code];
 
     db.query(sql, values);
+    client.del("result");
     res.status(200).send({
       message: "Data added successfully",
       success: true,
@@ -53,7 +84,7 @@ app.post("/save-data", (req, res) => {
   }
 });
 
-app.get("/get-data", (req, res) => {
+app.get("/get-data", cacheMiddleware, (req, res) => {
   try {
     const sql = "SELECT * FROM User";
 
@@ -66,9 +97,10 @@ app.get("/get-data", (req, res) => {
           success: false,
         });
       } else {
+        client.set("result", JSON.stringify(result));
         res.status(200).send({
           message: "Data fetched successfully",
-          result, 
+          result,
           success: true,
         });
       }
@@ -86,27 +118,3 @@ app.get("/get-data", (req, res) => {
 app.listen(8000, () => {
   console.log("listening...");
 });
-
-// const client = redis.createClient();
-
-// client.on("error", (error) => {
-//   console.log(error);
-// });
-// client.on("connect", (error) => {
-//   console.log("Connection established");
-// });
-
-// const cacheMiddleware = (req, res, next) => {
-//   // Check if data exists in Redis cache
-//   client.get((err, data) => {
-//     if (err) throw err;
-
-//     if (data !== null) {
-//       // Data exists in cache, return it to the client
-//       res.send(data);
-//     } else {
-//       // Data not found in cache, proceed to fetch it from the database
-//       next();
-//     }
-//   });
-// };
