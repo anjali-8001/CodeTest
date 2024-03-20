@@ -7,7 +7,7 @@ function Dashboard() {
 
   const getData = async () => {
     try {
-      const res = await axios.get(`http://localhost:8000/get-data`);
+      const res = await axios.get(`${process.env.REACT_APP_API}/get-data`);
       if (res?.data.success) {
         setResult(res?.data.result);
       }

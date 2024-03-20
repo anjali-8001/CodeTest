@@ -14,7 +14,7 @@ function Home() {
       return toast.error("Select a language");
     }
     try {
-      const res = await axios.post(`http://localhost:8000/save-data`, {
+      const res = await axios.post(`${process.env.REACT_APP_API}/save-data`, {
         username,
         language,
         stdin,
