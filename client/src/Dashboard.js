@@ -45,6 +45,9 @@ function Dashboard() {
               <th scope="col" className="px-0 py-3">
                 Code
               </th>
+              <th scope="col" className="px-0 py-3">
+                Output
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -66,6 +69,7 @@ function Dashboard() {
                         ? user.code.slice(0, 100) + "..."
                         : user.code}
                     </td>
+                    <td className="px-6 py-4">{user.output}</td>
                   </tr>
                 );
               })

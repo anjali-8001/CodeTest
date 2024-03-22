@@ -24,7 +24,7 @@ function Home() {
       });
       if (res?.data.success) {
         toast.success("Data saved");
-        navigate("/dashboard");
+        // navigate("/dashboard");
       }
     } catch (error) {
       console.log(error);
