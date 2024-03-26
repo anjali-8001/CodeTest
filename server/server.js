@@ -1,5 +1,5 @@
 const express = require("express");
-const mysql = require("mysql");
+const mysql = require("mysql2");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const redis = require("redis");
@@ -132,8 +132,15 @@ app.post("/save-data", async (req, res) => {
     while (response2.data.status.id === 1 || response2.data.status.id === 2) {
       response2 = await axios.request(options2);
     }
+    let output = "";
+    if (response2.data.stderr) {
+      output = response2.data.stderr;
+    } else if (response2.data.compile_output) {
+      output = response2.data.compile_output;
+    } else {
+      output = response2.data.stdout;
+    }
 
-    const output = response2.data.stdout;
     const sql =
       "INSERT INTO Info (username, language, stdin, code, output) VALUES (?, ?, ?, ?,?)";
     const values = [username, language, stdin, code, output];
