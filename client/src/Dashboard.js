@@ -68,7 +68,7 @@ function Dashboard() {
                   </th>
                   <td className="px-6 py-4">{user.language}</td>
                   <td className="px-6 py-4">{user.stdin}</td>
-                  <td className="px-6 py-4">{user.created_at}</td>
+                  <td className="px-6 py-4">{user.createdAt}</td>
                   <td className="px-0 py-4">
                     {user.code.length > 100 ? (
                       <>

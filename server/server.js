@@ -1,9 +1,11 @@
 const express = require("express");
-const mysql = require("mysql2");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const redis = require("redis");
 const axios = require("axios");
+const mongoose = require("mongoose");
+const connectDb = require("./db");
+const InfoModel = require("./InfoModel");
 
 const app = express();
 require("dotenv").config();
@@ -18,20 +20,7 @@ app.use(
   })
 );
 
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-});
-
-db.connect((err) => {
-  if (err) {
-    console.error("Error connecting to database:", err);
-    return;
-  }
-  console.log("Connected to MySQL database");
-});
+connectDb();
 
 const client = redis.createClient({
   password: process.env.REDIS_PASSWORD,
@@ -141,11 +130,14 @@ app.post("/save-data", async (req, res) => {
       output = response2.data.stdout;
     }
 
-    const sql =
-      "INSERT INTO Info (username, language, stdin, code, output) VALUES (?, ?, ?, ?,?)";
-    const values = [username, language, stdin, code, output];
+    const info = await new InfoModel({
+      username,
+      language,
+      stdin,
+      code,
+      output,
+    }).save();
 
-    db.query(sql, values);
     client.del("result");
     res.status(200).send({
       message: "Data added successfully",
@@ -161,26 +153,15 @@ app.post("/save-data", async (req, res) => {
   }
 });
 
-app.get("/get-data", cacheMiddleware, (req, res) => {
+app.get("/get-data", cacheMiddleware, async (req, res) => {
   try {
-    const sql = "SELECT * FROM Info";
+    const result = await InfoModel.find({});
 
-    db.query(sql, (err, result) => {
-      if (err) {
-        console.error("Error in getting data:", err);
-        res.status(500).send({
-          message: "Error in fetching data",
-          error: err,
-          success: false,
-        });
-      } else {
-        client.set("result", JSON.stringify(result));
-        res.status(200).send({
-          message: "Data fetched successfully",
-          result,
-          success: true,
-        });
-      }
+    client.set("result", JSON.stringify(result));
+    res.status(200).send({
+      message: "Data fetched successfully",
+      result,
+      success: true,
     });
   } catch (error) {
     console.log(error);
